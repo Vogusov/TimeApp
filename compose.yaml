@@ -1,6 +1,6 @@
 version: '3'
 
-services:
+services:  
   frontend:
     build: ./frontend
     volumes:
@@ -10,17 +10,25 @@ services:
     # Для фронтенда порты должны совпадать
     ports:
       - '3333:3333'
+
   api:
     build: ./api
     volumes:
       - /app/node_modules # использовать node_modules из образа (путь внутри контейнера)
       - ./api:/app # локальная(относительно compose.yaml):в контейнере(абсолютный)
+    environment: 
+      MYSQL_HOST: mysql
+      MYSQL_PORT: '3306'
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DB: time_db
     restart: always
     ports:
       - '5555:5000'
       # api будет созда после mysql
     depends_on:
       - mysql
+      
   mysql:
     image: mysql
     restart: always
@@ -30,11 +38,13 @@ services:
       MYSQL_DATABASE: time_db
     volumes:
       - mysql_data:/var/lib/mysql
+
   adminer:
     image: adminer
     restart: always
     ports:
       - '8889:8080'
       # Том внутри контейнера
+
 volumes:
   mysql_data:
